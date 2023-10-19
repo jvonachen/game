@@ -1,0 +1,135 @@
+#1 look for resources, learn how to recongnize resources
+#2 gather them somewhere secure
+#3 learn how to process those resources into more useful resources
+
+256 colors in the index
+colors:
+68% intensity
+c: 0, r: 0, g: 0, b: 0 black
+c: 1, r: 680, g: 0, b: 0 maroon
+c: 2, r: 0, g: 680, b: 0 green
+c: 3, r: 680, g: 680, b: olive
+c: 4, r: 0, g: 0, b: 680 navy
+c: 5, r: 680, g: 0, b: 680 purple
+c: 6, r: 0, g: 680, b: 680 teal
+c: 7, r: 680, g: 680, b: 680 silver
+100% intensity
+c: 8, r: 0, g: 0, b: 0 black
+c: 9, r: 1000, g: 0, b: 0 red
+c: 10, r: 0, g: 1000, b: 0 lime
+c: 11, r: 1000, g: 1000, b: 0 yellow
+c: 12, r: 0, g: 0, b: 1000 blue
+c: 13, r: 1000, g: 0, b: 1000 fuchia
+c: 14, r: 0, g: 1000, b: 1000 aqua
+c: 15, r: 1000, g: 1000, b: 1000 white
+.
+.
+.
+color pairs
+p: 0, f: 7, b:0
+p: 1, f: 0, b:0
+p: 2, f: 0, b:0
+p: 3, f: 0, b:0
+p: 4, f: 0, b:0
+p: 5, f: 0, b:0
+p: 6, f: 0, b:0
+p: 7, f: 0, b:0
+p: 8, f: 0, b:0
+p: 9, f: 0, b:0
+p: 10, f: 0, b:0
+p: 11, f: 0, b:0
+p: 12, f: 0, b:0
+p: 13, f: 0, b:0
+
+List of 256 colors for Xterm prompt
+256 bgfg color pairs also
+
+black -> white -> red -> black -> green -> white -> blue -> black -> cyan -> white -> magenta -> black -> yellow -> white -> orange -> black -> fuchsia -> white -> blue green -> black -> yellow green -> white -> aqua -> black -> purple -> white
+
+black (1), dark grey 8-0 (9),                 grey (1), light grey 0-7 (8),
+white (1), light red 7-0 (8),                  red (1), dark red 0-8 (9),
+black (1), dark green 8-0 (9),               green (1), light green 0-7 (8),
+white (1), light blue 7-0 (8),                blue (1), dark blue 0-8 (9),
+black (1), dark cyan 8-0 (9),                 cyan (1), light cyan 0-7 (8),
+white (1), light magenta 7-0 (8),          magenta (1), dark magenta 0-8 (9),
+black (1), dark yellow 8-0 (9),             yellow (1), light yellow 0-7 (8),
+white (1), light orange 7-0 (8),            orange (1), dark orange 0-8 (9),
+black (1), dark fuchsia 8-0 (9),           fuchsia (1), light fuchsia 0-7 (8),
+white (1), light blue green 7-0 (8),    blue green (1), dark blue green 0-8 (9),
+black (1), dark yellow green 8-0 (9), yellow green (1), light yellow green 0-7 (8),
+white (1), light aqua 7-0 (8),                aqua (1), dark aqua 0-8 (9),
+black (1), dark purple 8-0 (9),             purple (1), light purple 0-7 (8),
+white (1), grey dark yellow 7-0 (8) -> black
+
+1000 / 20
+
+8 50
+7 100
+6 150
+5 200
+4 250
+3 300
+2 350
+1 400
+0 450
+
+0 550
+1 600
+2 650
+3 700
+4 750
+5 800
+6 850
+7 900
+8 950
+
+1000 / 18
+
+7 52
+6 111
+5 166
+4 222
+3 277
+2 333
+1 388
+0 444
+
+0 555
+1 611
+2 666
+3 722
+4 777
+5 833
+6 888
+7 944
+
+1000 / 9
+
+0 111
+1 222
+2 333
+3 444
+4 555
+5 666
+6 777
+7 888
+
+
+black-> dark orange -> grey -> dark yellow -> black 
+
+********************************************************************
+
+curl -X POST https://api.random.org/json-rpc/4/invoke -H "content-Type: application/json" -d '{"jsonrpc":"2.0","method":"generateDecimalFractions","params":{"apiKey":"741cc2e9-9a93-49d9-b6c7-369d0b7227b4","n":10,"decimalPlaces":10,"replacement":true,"pregeneratedRandomization":null},"id":23600}' --libcurl test.cpp
+
+0.736191779
+0.8897842075
+0.2216700594
+0.9039842603
+0.0696272024
+0.1132408619
+0.4972836117
+0.6500729995
+0.4756038084
+0.5556687902
+
+Rolludo

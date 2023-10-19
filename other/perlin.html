@@ -1,0 +1,219 @@
+<html>
+
+<head>
+    <script>
+        var octaveAs = []; // array of arrays of points in octaves
+        var baseAmplitude;
+        var halfAmp;
+        var graphWidth;
+
+        var p;
+
+        function init() {
+            var pc1 = generateCurve();
+            p = new Array(graphWidth * 2);
+
+            for (var i = 0; i < graphWidth; i++) {
+                p[graphWidth + i] = p[i] = 256 / baseAmplitude * (pc1[i] + halfAmp);
+            }
+
+            generate2D();
+        }
+
+        function generateCurve() {
+            const OCTAVES = 5; // change these to display different curves
+            const BASE_SAMPLE_SIZE = 10;
+
+            perlinCurve = [];
+
+            // could make this a class with objects but this is a one off
+            const ras = []; // random arrays
+            const cans = []; // array of canvas DOM objects
+            const ctxs = []; // array of canvas contexts
+            const octaveAs = []; // array of arrays of points in octaves
+
+            baseAmplitude = (window.innerHeight - 240) / (OCTAVES + 1);
+            halfAmp = baseAmplitude / 2;
+            graphWidth = window.innerWidth - 25;
+
+            var CIRCULAR_DIAMETER = 0.5; // The tiny circles that make up the curves
+            var FULL_CIRCLE = 2 * Math.PI;
+
+            // make the octaves
+            for (var octave = 0; octave < OCTAVES; octave++) {
+                // create the random number arrays
+                ras[octave] = [];
+                for (var i = 0; i < BASE_SAMPLE_SIZE * 2 ** octave; i++) {
+                    // these two keep separate for clarity
+                    const randomNumber = Math.floor(Math.random() * (baseAmplitude / 2 ** octave));
+                    const amplitude = baseAmplitude / 2 ** (octave + 1);
+                    ras[octave].push(randomNumber - amplitude);
+                }
+
+                // setup the canvase to display the octave curve
+/*                var newCanvas = document.createElement('canvas');
+                document.body.appendChild(newCanvas);
+                newCanvas.width = graphWidth + '';
+                newCanvas.height = baseAmplitude + '';
+                ctxs.push(newCanvas.getContext('2d'));
+                cans.push(newCanvas);
+*/
+                octaveAs.push([]); // setup with an empty array
+
+                // make arrays of points which are cosine interpolated curves
+                for (var x = 0; x < ras[octave].length; x++) {
+                    var blockSize = graphWidth / ras[octave].length;
+                    for (var cix = 0; cix < blockSize; cix++) {
+                        octaveAs[octave].push(cosineInterpolate(ras[octave][x], ras[octave][x + 1], cix / blockSize));
+                    }
+                }
+/*
+                // the red line where 0 is on the y
+                ctxs[octave].moveTo(0, halfAmp);
+                ctxs[octave].lineTo(graphWidth, halfAmp);
+                ctxs[octave].strokeStyle = "red";
+                ctxs[octave].stroke();
+
+                // display the curve with teeny tiny filled circles
+                for (var xi = 0; xi < graphWidth; xi++) {
+                    ctxs[octave].beginPath();
+                    ctxs[octave].arc(xi, halfAmp + octaveAs[octave][xi], CIRCULAR_DIAMETER, 0, FULL_CIRCLE);
+                    ctxs[octave].fill();
+                }
+*/
+            }
+            // very important to interpolate
+            function cosineInterpolate(x1, x2, mu) {
+                var mu2 = (1 - Math.cos(mu * Math.PI)) / 2;
+                return x1 * (1 - mu2) + x2 * mu2;
+            }
+
+            // now make the perlin noise curve
+            // the curve will be too tall to display so scale it
+            var yScale = 0;
+            for (var octave = 0; octave < OCTAVES; octave++) {
+                yScale += 1 / 2 ** octave;
+            }
+
+            // setup the canvas for it
+            var newCanvas = document.createElement('canvas');
+            document.body.appendChild(newCanvas);
+            newCanvas.width = graphWidth + '';
+            newCanvas.height = baseAmplitude + '';
+            var ctx = newCanvas.getContext('2d');
+
+            // The red line
+            ctx.moveTo(0, halfAmp);
+            ctx.lineTo(graphWidth, halfAmp);
+            ctx.strokeStyle = "red";
+            ctx.stroke();
+
+            // display the perlin noise curve
+            for (var xi = 0; xi < graphWidth; xi++) {
+                ctx.beginPath();
+                var y = 0;
+                for (var octave = 0; octave < OCTAVES; octave++) {
+                    y += octaveAs[octave][xi];
+                }
+                const adjustedY = y / yScale;
+                perlinCurve.push(adjustedY);
+                ctx.arc(xi, halfAmp + adjustedY, CIRCULAR_DIAMETER, 0, FULL_CIRCLE);
+                ctx.fill();
+            }
+            return perlinCurve;
+        }
+
+        function generate2D() {
+            function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+            function lerp(t, a, b) { return a + t * (b - a); }
+
+            function grad(hash, x, y, z) {
+                // Convert lo 4 bits of hash code into 12 gradient directions.
+                var h = hash & 15,
+                    u = h < 8 ? x : y,
+                    v = h < 4 ? y : h == 12 || h == 14 ? x : z;
+                return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
+            }
+            
+            function noise2d(x, y) {
+                // Find unit square that contains point.
+                var
+                    X = Math.floor(x) & 255,
+                    Y = Math.floor(y) & 255;
+
+                // Find relative x,y of point in square.
+                x -= Math.floor(x);
+                y -= Math.floor(y);
+
+                // Compute fade curves for each of x,y.
+                var
+                    u = fade(x),
+                    v = fade(y);
+
+                // Hash coordinates of the corners.
+                var
+                    A = p[X] + Y,
+                    AA = p[A],
+                    AB = p[A + 1],
+                    B = p[X + 1] + Y,
+                    BA = p[B],
+                    BB = p[B + 1];
+
+                function scale(n) {
+                    return (1 + n) / 2;
+                }
+
+                // Add blended results from the corners.
+                return scale(
+                    lerp(
+                        v,
+                        lerp(
+                            u,
+                            grad(p[AA], x, y, 0),
+                            grad(p[BA], x - 1, y, 0)
+                        ),
+                        lerp(
+                            u,
+                            grad(p[AB], x, y - 1, 0),
+                            grad(p[BB], x - 1, y - 1, 0)
+                        )
+                    )
+                );
+            }
+
+            var newCanvas = document.createElement('canvas');
+            document.body.appendChild(newCanvas);
+            const TDW = 200;
+            const TDH = 200;
+            newCanvas.width = TDW + '';
+            newCanvas.height = TDH + '';
+            const id = new ImageData(TDW, TDH);
+
+            var offset = 0;
+            const inc = 1;
+            for (var y = 0; y < TDH; y++) {
+                for (var x = 0; x < TDW; x++) {
+                    const point = (x + y * TDW) * 4;
+                    const r = noise2d(point[offset], point[offset]);
+                    console.log(r);
+                    id.data[point] = r;
+                    id.data[point + 1] = r;
+                    id.data[point + 2] = r;
+                    id.data[point + 3] = 255; // full opaque
+                    offset += inc;
+                }
+            }
+            newCanvas.getContext('2d').putImageData(id, 0, 0);
+        }
+    </script>
+    <style>
+        canvas {
+            border: 1px solid blue;
+        }
+    </style>
+</head>
+
+<body onload="init();">
+</body>
+
+</html>
